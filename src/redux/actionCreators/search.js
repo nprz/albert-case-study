@@ -14,15 +14,27 @@ function receiveSearch(results) {
   };
 }
 
-export function fetchSearch(query) {
+export function fetchSearch(q, category) {
   return function(dispatch) {
     dispatch(requestSearch());
-    // queue api calls, some calls are coming back
-    // later than others
+
+    const query = {
+      q,
+      limit: 10,
+      mode: "ebooks"
+    };
+
+    if (category !== "all") {
+      console.log("h");
+      query.q = `${category}:"${q}"`;
+    }
+
     superagent
       .get(`https://openlibrary.org/search.json`)
-      .query({ q: query, limit: 10 })
+      .query(query)
       .then(res => {
+        // if previous q is a substring of current q ignore update
+        // time stamps are a better solution, forward and backward
         dispatch(receiveSearch(JSON.parse(res.text)));
       });
   };

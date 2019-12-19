@@ -13,13 +13,23 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 // Style
 import { makeStyles } from "@material-ui/core/Styles";
 
 const useStyles = makeStyles({
-  root: {
-    width: "100%"
+  inputContainer: {
+    width: "100%",
+    display: "flex"
+  },
+  input: {
+    width: "100%",
+    marginLeft: 8
+  },
+  select: {
+    width: 75
   },
   listContainer: {
     position: "absolute",
@@ -34,6 +44,15 @@ const useStyles = makeStyles({
     height: 20
   }
 });
+
+export const categoryDict = {
+  ALL: "all",
+  TITLE: "title",
+  AUTHOR: "author",
+  TEXT: "text",
+  SUBJECT: "subject",
+  LISTS: "lists"
+};
 
 function BookListItem({ title, author, link }) {
   return (
@@ -71,11 +90,26 @@ function renderResults(results, searchValue, isLoading, handleClick) {
   ));
 }
 
+function renderMenuItems() {
+  let menuItems = [];
+
+  for (const category in categoryDict) {
+    menuItems.push(
+      <MenuItem value={categoryDict[category]}>
+        {categoryDict[category].toUpperCase()}
+      </MenuItem>
+    );
+  }
+
+  return menuItems;
+}
+
 export default function SearchInput({ fetchSearch, isLoading, results }) {
   const classes = useStyles();
   const [searchValue, setSearchValue] = useState("");
   const [inputFocus, setInputFocus] = useState(false);
   const [listVisible, setListVisible] = useState(false);
+  const [selectValue, setSelectValue] = useState("all");
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -87,47 +121,59 @@ export default function SearchInput({ fetchSearch, isLoading, results }) {
   }, [inputFocus, searchValue]);
 
   const handleChange = e => {
-    setSearchValue(e.target.value || "");
-    fetchSearch(e.target.value || "");
+    setSearchValue(e.target.value);
+    fetchSearch(e.target.value, selectValue);
   };
 
   const handleSearchAgain = () => {
     setSearchValue("");
-    fetchSearch("");
+    fetchSearch("", selectValue);
     inputRef.current.focus();
   };
 
   return (
     <>
-      <TextField
-        className={classes.root}
-        value={searchValue}
-        onChange={e => handleChange(e)}
-        variant="outlined"
-        label="Search"
-        inputRef={inputRef}
-        onFocus={() => setInputFocus(true)}
-        onBlur={() => setInputFocus(false)}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment>
-              <SearchIcon />
-            </InputAdornment>
-          ),
-          endAdornment: (
-            <InputAdornment>
-              {isLoading ? (
-                <CircularProgress size={20} />
-              ) : (
-                <div className={classes.placeHolder} />
-              )}
-              <IconButton onClick={handleChange}>
-                <ClearIcon />
-              </IconButton>
-            </InputAdornment>
-          )
-        }}
-      />
+      <div className={classes.inputContainer}>
+        <Select
+          classes={{
+            root: classes.select
+          }}
+          variant="outlined"
+          value={selectValue}
+          onChange={e => setSelectValue(e.target.value)}
+        >
+          {renderMenuItems()}
+        </Select>
+        <TextField
+          value={searchValue}
+          onChange={e => handleChange(e)}
+          className={classes.input}
+          variant="outlined"
+          label="Search"
+          inputRef={inputRef}
+          onFocus={() => setInputFocus(true)}
+          onBlur={() => setInputFocus(false)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment>
+                <SearchIcon />
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment>
+                {isLoading ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  <div className={classes.placeHolder} />
+                )}
+                <IconButton onClick={handleSearchAgain}>
+                  <ClearIcon />
+                </IconButton>
+              </InputAdornment>
+            )
+          }}
+        />
+      </div>
       {listVisible && (
         <div className={classes.listContainer}>
           <Paper className={classes.paper}>

@@ -20,7 +20,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  fetchSearch: value => dispatch(fetchSearch(value))
+  fetchSearch: (value, category) => dispatch(fetchSearch(value, category))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchInput);

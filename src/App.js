@@ -18,10 +18,7 @@ const useStyles = makeStyles({
     width: 800,
     minWidth: 0,
     margin: "0px auto",
-    padding: "0px 32px",
-    display: "flex",
-    justifyContent: "center",
-    position: "relative"
+    padding: "0px 32px"
   }
 });
 
