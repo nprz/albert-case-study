@@ -8,11 +8,11 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
   root: {
-    height: "100vh",
+    height: "calc(100vh - 32px)",
     width: "100vw",
     display: "flex",
     justifyContent: "center",
-    marginTop: 28
+    marginTop: 32
   },
   pageLayout: {
     width: 800,

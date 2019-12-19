@@ -17,7 +17,8 @@ function receiveSearch(results) {
 export function fetchSearch(query) {
   return function(dispatch) {
     dispatch(requestSearch());
-
+    // queue api calls, some calls are coming back
+    // later than others
     superagent
       .get(`https://openlibrary.org/search.json`)
       .query({ q: query, limit: 10 })

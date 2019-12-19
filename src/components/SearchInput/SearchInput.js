@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 // Components
 import TextField from "@material-ui/core/TextField";
@@ -12,13 +12,13 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
+import Button from "@material-ui/core/Button";
 
 // Style
 import { makeStyles } from "@material-ui/core/Styles";
 
 const useStyles = makeStyles({
   root: {
-    border: "1px solid red",
     width: "100%"
   },
   listContainer: {
@@ -27,7 +27,7 @@ const useStyles = makeStyles({
     right: 0,
     top: 56,
     padding: "0px 32px",
-    border: "1px solid black"
+    marginBottom: 32
   },
   placeHolder: {
     width: 20,
@@ -49,13 +49,25 @@ function BookListItem({ title, author, link }) {
   );
 }
 
-function renderResults(results) {
-  return results.map(result => (
-    <BookListItem
-      title={result.title}
-      author={result.title}
-      link={result.link}
-    />
+function renderResults(results, searchValue, isLoading, handleClick) {
+  if (!results.length && searchValue && !isLoading) {
+    return (
+      <ListItem>
+        <ListItemText primary={`Sorry! No results found for ${searchValue}`} />
+        <Button onClick={handleClick}>Search Again?</Button>
+      </ListItem>
+    );
+  }
+
+  return results.map((result, index) => (
+    <>
+      <BookListItem
+        title={result.title}
+        author={result.title}
+        link={result.link}
+      />
+      {index !== results.length - 1 && <Divider />}
+    </>
   ));
 }
 
@@ -64,6 +76,7 @@ export default function SearchInput({ fetchSearch, isLoading, results }) {
   const [searchValue, setSearchValue] = useState("");
   const [inputFocus, setInputFocus] = useState(false);
   const [listVisible, setListVisible] = useState(false);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (searchValue) {
@@ -78,6 +91,12 @@ export default function SearchInput({ fetchSearch, isLoading, results }) {
     fetchSearch(e.target.value || "");
   };
 
+  const handleSearchAgain = () => {
+    setSearchValue("");
+    fetchSearch("");
+    inputRef.current.focus();
+  };
+
   return (
     <>
       <TextField
@@ -86,6 +105,7 @@ export default function SearchInput({ fetchSearch, isLoading, results }) {
         onChange={e => handleChange(e)}
         variant="outlined"
         label="Search"
+        inputRef={inputRef}
         onFocus={() => setInputFocus(true)}
         onBlur={() => setInputFocus(false)}
         InputProps={{
@@ -111,7 +131,14 @@ export default function SearchInput({ fetchSearch, isLoading, results }) {
       {listVisible && (
         <div className={classes.listContainer}>
           <Paper className={classes.paper}>
-            <List className>{renderResults(results)}</List>
+            <List className>
+              {renderResults(
+                results,
+                searchValue,
+                isLoading,
+                handleSearchAgain
+              )}
+            </List>
           </Paper>
         </div>
       )}
