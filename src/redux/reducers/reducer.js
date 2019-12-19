@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
-import toggle from "redux/reducers/toggle";
+import search from "redux/reducers/search";
 
 export default combineReducers({
-  toggle
+  search
 });
