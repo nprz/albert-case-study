@@ -1,22 +1,24 @@
 import superagent from "superagent";
 import { REQUEST_SEARCH, REQUEST_SEARCH_SUCCESS } from "redux/actions/search";
 
-function requestSearch() {
+function requestSearch(lastQuery) {
   return {
-    type: REQUEST_SEARCH
+    type: REQUEST_SEARCH,
+    lastQuery
   };
 }
 
-function receiveSearch(results) {
+function receiveSearch(results, query) {
   return {
     type: REQUEST_SEARCH_SUCCESS,
-    results
+    results,
+    query
   };
 }
 
 export function fetchSearch(q, category) {
   return function(dispatch) {
-    dispatch(requestSearch());
+    dispatch(requestSearch(q));
 
     const query = {
       q,
@@ -33,7 +35,7 @@ export function fetchSearch(q, category) {
       .query(query)
       .then(res => {
         // time stamps are a better solution, forward and backward
-        dispatch(receiveSearch(JSON.parse(res.text)));
+        dispatch(receiveSearch(JSON.parse(res.text), q));
       });
   };
 }

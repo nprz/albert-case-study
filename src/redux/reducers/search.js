@@ -3,7 +3,8 @@ import { REQUEST_SEARCH, REQUEST_SEARCH_SUCCESS } from "redux/actions/search";
 function search(
   state = {
     isFetching: false,
-    results: []
+    results: [],
+    lastQuery: null
   },
   action
 ) {
@@ -11,9 +12,18 @@ function search(
     case REQUEST_SEARCH:
       return {
         ...state,
-        isFetching: true
+        isFetching: true,
+        lastQuery: action.lastQuery
       };
     case REQUEST_SEARCH_SUCCESS:
+      // Prevent late responding API calls from overwriting
+      // most current API call
+      if (state.lastQuery !== action.query) {
+        return {
+          ...state
+        };
+      }
+
       return {
         ...state,
         results: action.results.docs,
