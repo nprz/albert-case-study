@@ -1,6 +1,9 @@
-import { REQUEST_SEARCH, REQUEST_SEARCH_SUCCESS } from "redux/actions/search";
+import {
+  REQUEST_SEARCH_RESULTS,
+  REQUEST_SEARCH_RESULTS_SUCCESS
+} from "redux/actions/searchResults";
 
-function search(
+function searchResults(
   state = {
     isFetching: false,
     results: []
@@ -8,21 +11,21 @@ function search(
   action
 ) {
   switch (action.type) {
-    case REQUEST_SEARCH:
+    case REQUEST_SEARCH_RESULTS:
       return {
         ...state,
         isFetching: true
       };
-    case REQUEST_SEARCH_SUCCESS:
+    case REQUEST_SEARCH_RESULTS_SUCCESS:
       return {
         ...state,
         results: action.results.docs,
         isFetching: false
       };
-    // case: REQUEST_SEARCH_ERROR:
+    // case REQUEST_SEARCH_RESULTS_ERROR:
     default:
       return state;
   }
 }
 
-export default search;
+export default searchResults;

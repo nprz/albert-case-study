@@ -2,6 +2,7 @@ import React from "react";
 
 // Components
 import SearchInput from "components/SearchInput";
+import SearchResults from "components/SearchResults";
 
 // Style
 import { makeStyles } from "@material-ui/core/styles";
@@ -28,6 +29,7 @@ function App() {
     <div className={classes.root}>
       <div className={classes.pageLayout}>
         <SearchInput />
+        <SearchResults />
       </div>
     </div>
   );

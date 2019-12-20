@@ -24,9 +24,13 @@ const useStyles = makeStyles({
     width: "100%",
     display: "flex"
   },
-  input: {
+  inputAndResults: {
     width: "100%",
-    marginLeft: 8
+    margin: "0px 8px",
+    position: "relative"
+  },
+  input: {
+    width: "100%"
   },
   select: {
     width: 75
@@ -36,8 +40,10 @@ const useStyles = makeStyles({
     left: 0,
     right: 0,
     top: 56,
-    padding: "0px 32px",
     marginBottom: 32
+  },
+  button: {
+    width: 120
   },
   placeHolder: {
     width: 20,
@@ -104,7 +110,12 @@ function renderMenuItems() {
   return menuItems;
 }
 
-export default function SearchInput({ fetchSearch, isLoading, results }) {
+export default function SearchInput({
+  fetchSearch,
+  fetchSearchResults,
+  isLoading,
+  results
+}) {
   const classes = useStyles();
   const [searchValue, setSearchValue] = useState("");
   const [inputFocus, setInputFocus] = useState(false);
@@ -127,23 +138,23 @@ export default function SearchInput({ fetchSearch, isLoading, results }) {
 
   const handleSearchAgain = () => {
     setSearchValue("");
-    fetchSearch("", selectValue);
+    // fetchSearch("", selectValue);
     inputRef.current.focus();
   };
 
   return (
-    <>
-      <div className={classes.inputContainer}>
-        <Select
-          classes={{
-            root: classes.select
-          }}
-          variant="outlined"
-          value={selectValue}
-          onChange={e => setSelectValue(e.target.value)}
-        >
-          {renderMenuItems()}
-        </Select>
+    <div className={classes.inputContainer}>
+      <Select
+        classes={{
+          root: classes.select
+        }}
+        variant="outlined"
+        value={selectValue}
+        onChange={e => setSelectValue(e.target.value)}
+      >
+        {renderMenuItems()}
+      </Select>
+      <div className={classes.inputAndResults}>
         <TextField
           value={searchValue}
           onChange={e => handleChange(e)}
@@ -173,21 +184,29 @@ export default function SearchInput({ fetchSearch, isLoading, results }) {
             )
           }}
         />
+        {listVisible && (
+          <div className={classes.listContainer}>
+            <Paper className={classes.paper}>
+              <List className>
+                {renderResults(
+                  results,
+                  searchValue,
+                  isLoading,
+                  handleSearchAgain
+                )}
+              </List>
+            </Paper>
+          </div>
+        )}
       </div>
-      {listVisible && (
-        <div className={classes.listContainer}>
-          <Paper className={classes.paper}>
-            <List className>
-              {renderResults(
-                results,
-                searchValue,
-                isLoading,
-                handleSearchAgain
-              )}
-            </List>
-          </Paper>
-        </div>
-      )}
-    </>
+      <Button
+        variant="contained"
+        color="primary"
+        className={classes.button}
+        onClick={() => fetchSearchResults(searchValue, selectValue, 1)}
+      >
+        SEARCH
+      </Button>
+    </div>
   );
 }

@@ -25,7 +25,6 @@ export function fetchSearch(q, category) {
     };
 
     if (category !== "all") {
-      console.log("h");
       query.q = `${category}:"${q}"`;
     }
 
@@ -33,7 +32,6 @@ export function fetchSearch(q, category) {
       .get(`https://openlibrary.org/search.json`)
       .query(query)
       .then(res => {
-        // if previous q is a substring of current q ignore update
         // time stamps are a better solution, forward and backward
         dispatch(receiveSearch(JSON.parse(res.text)));
       });

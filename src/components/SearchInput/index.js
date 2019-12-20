@@ -1,6 +1,7 @@
 import { connect } from "react-redux";
 import SearchInput from "./SearchInput";
 import { fetchSearch } from "redux/actionCreators/search";
+import { fetchSearchResults } from "redux/actionCreators/searchResults";
 
 function processResults(results) {
   return results.map(result => ({
@@ -20,7 +21,9 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  fetchSearch: (value, category) => dispatch(fetchSearch(value, category))
+  fetchSearch: (value, category) => dispatch(fetchSearch(value, category)),
+  fetchSearchResults: (value, category, page) =>
+    dispatch(fetchSearchResults(value, category, page))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchInput);
