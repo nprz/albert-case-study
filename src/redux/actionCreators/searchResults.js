@@ -21,9 +21,10 @@ function receiveSearchResults(results, query, page, category) {
   };
 }
 
-function receiveSearchResultsError() {
+function receiveSearchResultsError(query) {
   return {
-    type: REQUEST_SEARCH_RESULTS_ERROR
+    type: REQUEST_SEARCH_RESULTS_ERROR,
+    query
   };
 }
 
@@ -31,7 +32,6 @@ export function fetchSearchResults(q, category, page) {
   return function(dispatch) {
     dispatch(requestSearchResults());
 
-    // TODO: make sure this query is correct
     const query = {
       q,
       limit: 10,
@@ -47,11 +47,10 @@ export function fetchSearchResults(q, category, page) {
       .get(`https://openlibrary.org/search.json`)
       .query(query)
       .then(res => {
-        // time stamps are a better solution, forward and backward
         dispatch(receiveSearchResults(JSON.parse(res.text), q, page, category));
       })
       .catch(err => {
-        dispatch(receiveSearchResultsError());
+        dispatch(receiveSearchResultsError(q));
       });
   };
 }

@@ -37,6 +37,7 @@ function searchResults(
       return {
         ...state,
         error: true,
+        query: action.query,
         isFetching: false
       };
     default:

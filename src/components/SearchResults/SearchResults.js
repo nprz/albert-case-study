@@ -74,7 +74,6 @@ function renderSearchResults(
   }
 
   if (error) {
-    console.log({ query });
     return (
       <Card>
         <CardContent className={classes.errorContent}>

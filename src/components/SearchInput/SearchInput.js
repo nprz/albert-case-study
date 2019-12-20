@@ -137,7 +137,6 @@ export default function SearchInput({
     } else {
       setListVisible(false);
     }
-    console.log({ listVisible, inputFocus, searchValue });
   }, [inputFocus, searchValue]);
 
   const handleChange = e => {
@@ -150,6 +149,13 @@ export default function SearchInput({
     setSearchValue("");
     fetchSearch("", selectValue);
     inputRef.current.focus();
+  };
+
+  const handleKeyPress = e => {
+    if (e.key === "Enter") {
+      fetchSearchResults(searchValue, selectValue, 1);
+      setInputFocus(false);
+    }
   };
 
   return (
@@ -174,6 +180,7 @@ export default function SearchInput({
           inputRef={inputRef}
           onFocus={() => setInputFocus(true)}
           onBlur={() => setTimeout(() => setInputFocus(false), 250)}
+          onKeyPress={handleKeyPress}
           InputProps={{
             startAdornment: (
               <InputAdornment>
