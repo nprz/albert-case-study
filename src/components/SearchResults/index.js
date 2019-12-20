@@ -12,13 +12,25 @@ function processResults(results) {
 }
 
 const mapStateToProps = state => {
+  const {
+    results,
+    totalResults,
+    query,
+    page,
+    category,
+    isFetching,
+    error
+  } = state.searchResults;
+
   return {
-    searchResults: processResults(state.searchResults.results),
-    totalResults: state.searchResults.totalResults,
-    query: state.searchResults.query,
-    page: state.searchResults.page,
-    category: state.searchResults.category,
-    isLoading: state.searchResults.isFetching
+    totalResults,
+    query,
+    page,
+    category,
+    error,
+    searchResults: processResults(results),
+
+    isLoading: isFetching
   };
 };
 

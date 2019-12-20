@@ -1,10 +1,15 @@
-import { REQUEST_SEARCH, REQUEST_SEARCH_SUCCESS } from "redux/actions/search";
+import {
+  REQUEST_SEARCH,
+  REQUEST_SEARCH_SUCCESS,
+  REQUEST_SEARCH_ERROR
+} from "redux/actions/search";
 
 function search(
   state = {
     isFetching: false,
     results: [],
-    lastQuery: null
+    lastQuery: null,
+    error: false
   },
   action
 ) {
@@ -13,6 +18,7 @@ function search(
       return {
         ...state,
         isFetching: true,
+        error: false,
         lastQuery: action.lastQuery
       };
     case REQUEST_SEARCH_SUCCESS:
@@ -29,7 +35,12 @@ function search(
         results: action.results.docs,
         isFetching: false
       };
-    // case: REQUEST_SEARCH_ERROR:
+    case REQUEST_SEARCH_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        error: true
+      };
     default:
       return state;
   }

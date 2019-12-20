@@ -53,11 +53,7 @@ const useStyles = makeStyles({
 
 export const categoryDict = {
   ALL: "all",
-  TITLE: "title",
-  AUTHOR: "author",
-  TEXT: "text",
-  SUBJECT: "subject",
-  LISTS: "lists"
+  TITLE: "title"
 };
 
 function BookListItem({ title, author, link }) {
@@ -65,7 +61,7 @@ function BookListItem({ title, author, link }) {
     <ListItem
       button
       component="a"
-      href={`https://openlibrary.org/${link}`}
+      href={`https://openlibrary.org${link}`}
       target="_blank"
       rel="noopener"
     >
@@ -74,10 +70,21 @@ function BookListItem({ title, author, link }) {
   );
 }
 
-function renderResults(results, searchValue, isLoading, handleClick) {
+function renderResults(results, searchValue, isLoading, handleClick, error) {
+  if (error) {
+    return (
+      <ListItem key={"key"}>
+        <ListItemText
+          primary={`Sorry! We were unable to process a search for "${searchValue}"`}
+        />
+        <Button onClick={handleClick}>Search Again?</Button>
+      </ListItem>
+    );
+  }
+
   if (!results.length && searchValue && !isLoading) {
     return (
-      <ListItem>
+      <ListItem key={"key"}>
         <ListItemText primary={`Sorry! No results found for ${searchValue}`} />
         <Button onClick={handleClick}>Search Again?</Button>
       </ListItem>
@@ -85,14 +92,14 @@ function renderResults(results, searchValue, isLoading, handleClick) {
   }
 
   return results.map((result, index) => (
-    <>
+    <div key={result.link}>
       <BookListItem
         title={result.title}
         author={result.author}
         link={result.link}
       />
       {index !== results.length - 1 && <Divider />}
-    </>
+    </div>
   ));
 }
 
@@ -114,7 +121,8 @@ export default function SearchInput({
   fetchSearch,
   fetchSearchResults,
   isLoading,
-  results
+  results,
+  error
 }) {
   const classes = useStyles();
   const [inputFocus, setInputFocus] = useState(false);
@@ -124,21 +132,23 @@ export default function SearchInput({
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (searchValue) {
+    if (searchValue && inputFocus) {
       setListVisible(true);
     } else {
       setListVisible(false);
     }
+    console.log({ listVisible, inputFocus, searchValue });
   }, [inputFocus, searchValue]);
 
   const handleChange = e => {
     setSearchValue(e.target.value);
     fetchSearch(e.target.value, selectValue);
+    setInputFocus(true);
   };
 
   const handleSearchAgain = () => {
     setSearchValue("");
-    // fetchSearch("", selectValue);
+    fetchSearch("", selectValue);
     inputRef.current.focus();
   };
 
@@ -163,7 +173,7 @@ export default function SearchInput({
           label="Search"
           inputRef={inputRef}
           onFocus={() => setInputFocus(true)}
-          onBlur={() => setInputFocus(false)}
+          onBlur={() => setTimeout(() => setInputFocus(false), 250)}
           InputProps={{
             startAdornment: (
               <InputAdornment>
@@ -187,12 +197,13 @@ export default function SearchInput({
         {listVisible && (
           <div className={classes.listContainer}>
             <Paper className={classes.paper}>
-              <List className>
+              <List>
                 {renderResults(
                   results,
                   searchValue,
                   isLoading,
-                  handleSearchAgain
+                  handleSearchAgain,
+                  error
                 )}
               </List>
             </Paper>

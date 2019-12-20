@@ -8,6 +8,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
+import Button from "@material-ui/core/Button";
 
 // Helpers
 import { transparentize } from "polished";
@@ -45,6 +46,12 @@ const useStyles = makeStyles(theme => {
     },
     paginationCopy: {
       margin: "0px 8px"
+    },
+    errorContent: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "column"
     }
   };
 });
@@ -59,10 +66,30 @@ function renderSearchResults(
   page,
   category,
   fetchSearchResults,
+  error,
   classes
 ) {
   if (isLoading) {
     return <CircularProgress size={40} />;
+  }
+
+  if (error) {
+    console.log({ query });
+    return (
+      <Card>
+        <CardContent className={classes.errorContent}>
+          <Typography variant="h6">
+            Sorry! We were unable to process your request for <b>"{query}"</b>
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => fetchSearchResults(query, category, page)}
+          >
+            Retry?
+          </Button>
+        </CardContent>
+      </Card>
+    );
   }
 
   const visibleResults = searchResults.map(result => (
@@ -72,6 +99,7 @@ function renderSearchResults(
       href={`https://openlibrary.org${result.link}`}
       rel="noopener"
       target="_blank"
+      key={result.link}
     >
       <CardContent>
         <Typography variant="h6">{result.title}</Typography>
@@ -125,7 +153,8 @@ export default function SearchResults({
   query,
   page,
   category,
-  fetchSearchResults
+  fetchSearchResults,
+  error
 }) {
   const classes = useStyles();
 
@@ -139,6 +168,7 @@ export default function SearchResults({
         page,
         category,
         fetchSearchResults,
+        error,
         classes
       )}
     </div>

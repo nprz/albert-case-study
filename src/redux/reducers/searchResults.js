@@ -1,6 +1,7 @@
 import {
   REQUEST_SEARCH_RESULTS,
-  REQUEST_SEARCH_RESULTS_SUCCESS
+  REQUEST_SEARCH_RESULTS_SUCCESS,
+  REQUEST_SEARCH_RESULTS_ERROR
 } from "redux/actions/searchResults";
 
 function searchResults(
@@ -10,7 +11,8 @@ function searchResults(
     totalResults: null,
     page: null,
     category: null,
-    query: null
+    query: null,
+    error: false
   },
   action
 ) {
@@ -18,7 +20,8 @@ function searchResults(
     case REQUEST_SEARCH_RESULTS:
       return {
         ...state,
-        isFetching: true
+        isFetching: true,
+        error: false
       };
     case REQUEST_SEARCH_RESULTS_SUCCESS:
       return {
@@ -30,7 +33,12 @@ function searchResults(
         category: action.category,
         isFetching: false
       };
-    // case REQUEST_SEARCH_RESULTS_ERROR:
+    case REQUEST_SEARCH_RESULTS_ERROR:
+      return {
+        ...state,
+        error: true,
+        isFetching: false
+      };
     default:
       return state;
   }

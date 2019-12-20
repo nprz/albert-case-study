@@ -1,5 +1,9 @@
 import superagent from "superagent";
-import { REQUEST_SEARCH, REQUEST_SEARCH_SUCCESS } from "redux/actions/search";
+import {
+  REQUEST_SEARCH,
+  REQUEST_SEARCH_SUCCESS,
+  REQUEST_SEARCH_ERROR
+} from "redux/actions/search";
 
 function requestSearch(lastQuery) {
   return {
@@ -13,6 +17,12 @@ function receiveSearch(results, query) {
     type: REQUEST_SEARCH_SUCCESS,
     results,
     query
+  };
+}
+
+function receiveError() {
+  return {
+    type: REQUEST_SEARCH_ERROR
   };
 }
 
@@ -36,6 +46,9 @@ export function fetchSearch(q, category) {
       .then(res => {
         // time stamps are a better solution, forward and backward
         dispatch(receiveSearch(JSON.parse(res.text), q));
+      })
+      .catch(err => {
+        dispatch(receiveError());
       });
   };
 }

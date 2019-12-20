@@ -12,11 +12,12 @@ function processResults(results) {
 }
 
 const mapStateToProps = state => {
-  const { results, isFetching } = state.search;
+  const { results, isFetching, error } = state.search;
 
   return {
     isLoading: isFetching,
-    results: processResults(results)
+    results: processResults(results),
+    error
   };
 };
 
