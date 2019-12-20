@@ -3,11 +3,14 @@ import SearchInput from "./SearchInput";
 import { fetchSearch } from "redux/actionCreators/search";
 import { fetchSearchResults } from "redux/actionCreators/searchResults";
 
+// Helpers
+import _get from "lodash/get";
+
 function processResults(results) {
   return results.map(result => ({
-    author: result.author_name && result.author_name.join(", "),
-    title: result.title,
-    link: result.key
+    author: _get(result, "author_name", ["unknown"]).join(", "),
+    title: _get(result, "title", "-"),
+    link: _get(result, "key", "#")
   }));
 }
 

@@ -108,7 +108,7 @@ function renderMenuItems() {
 
   for (const category in categoryDict) {
     menuItems.push(
-      <MenuItem value={categoryDict[category]}>
+      <MenuItem value={categoryDict[category]} key={categoryDict[category]}>
         {categoryDict[category].toUpperCase()}
       </MenuItem>
     );
@@ -204,7 +204,7 @@ export default function SearchInput({
         {listVisible && (
           <div className={classes.listContainer}>
             <Paper className={classes.paper}>
-              <List>
+              <List disablePadding={true}>
                 {renderResults(
                   results,
                   searchValue,

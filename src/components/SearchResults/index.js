@@ -2,12 +2,15 @@ import { connect } from "react-redux";
 import SearchResults from "./SearchResults";
 import { fetchSearchResults } from "redux/actionCreators/searchResults";
 
+// Helpers
+import _get from "lodash/get";
+
 function processResults(results) {
   return results.map(result => ({
-    author: result.author_name && result.author_name.join(", "),
-    title: result.title,
-    link: result.key,
-    year: result.first_publish_year
+    author: _get(result, "author_name", ["unknown"]).join(", "),
+    title: _get(result, "title", "-"),
+    link: _get(result, "key", "#"),
+    year: _get(result, "first_publish_year", "unknown")
   }));
 }
 
