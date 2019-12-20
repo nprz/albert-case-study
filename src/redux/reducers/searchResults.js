@@ -6,7 +6,8 @@ import {
 function searchResults(
   state = {
     isFetching: false,
-    results: []
+    results: [],
+    totalResults: null
   },
   action
 ) {
@@ -20,6 +21,7 @@ function searchResults(
       return {
         ...state,
         results: action.results.docs,
+        totalResults: action.results.numFound,
         isFetching: false
       };
     // case REQUEST_SEARCH_RESULTS_ERROR:

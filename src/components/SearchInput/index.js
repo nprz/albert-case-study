@@ -7,7 +7,7 @@ function processResults(results) {
   return results.map(result => ({
     author: result.author_name && result.author_name.join(", "),
     title: result.title,
-    link: result.seed[0]
+    link: result.key
   }));
 }
 

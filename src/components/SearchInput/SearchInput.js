@@ -88,7 +88,7 @@ function renderResults(results, searchValue, isLoading, handleClick) {
     <>
       <BookListItem
         title={result.title}
-        author={result.title}
+        author={result.author}
         link={result.link}
       />
       {index !== results.length - 1 && <Divider />}
@@ -114,13 +114,14 @@ export default function SearchInput({
   fetchSearch,
   fetchSearchResults,
   isLoading,
-  results
+  results,
+  searchValue,
+  setSearchValue
 }) {
   const classes = useStyles();
-  const [searchValue, setSearchValue] = useState("");
   const [inputFocus, setInputFocus] = useState(false);
   const [listVisible, setListVisible] = useState(false);
-  const [selectValue, setSelectValue] = useState("all");
+  const [selectValue, setSelectValue] = useState(categoryDict.ALL);
   const inputRef = useRef(null);
 
   useEffect(() => {

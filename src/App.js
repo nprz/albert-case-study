@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 // Components
 import SearchInput from "components/SearchInput";
@@ -25,11 +25,16 @@ const useStyles = makeStyles({
 
 function App() {
   const classes = useStyles();
+  const [searchValue, setSearchValue] = useState("");
+
   return (
     <div className={classes.root}>
       <div className={classes.pageLayout}>
-        <SearchInput />
-        <SearchResults />
+        <SearchInput
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
+        />
+        <SearchResults searchValue={searchValue} />
       </div>
     </div>
   );
