@@ -7,7 +7,10 @@ function searchResults(
   state = {
     isFetching: false,
     results: [],
-    totalResults: null
+    totalResults: null,
+    page: null,
+    category: null,
+    query: null
   },
   action
 ) {
@@ -22,6 +25,9 @@ function searchResults(
         ...state,
         results: action.results.docs,
         totalResults: action.results.numFound,
+        query: action.query,
+        page: action.page,
+        category: action.category,
         isFetching: false
       };
     // case REQUEST_SEARCH_RESULTS_ERROR:

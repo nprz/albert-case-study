@@ -5,6 +5,9 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
 
 // Helpers
 import { transparentize } from "polished";
@@ -31,18 +34,32 @@ const useStyles = makeStyles(theme => {
     },
     searchResultInfo: {
       width: "100%",
-      border: "1px solid",
       marginBottom: 16
+    },
+    paginationContainer: {
+      height: 32,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 32
+    },
+    paginationCopy: {
+      margin: "0px 8px"
     }
   };
 });
 
+const PAGE_SIZE = 10;
+
 function renderSearchResults(
   searchResults,
   isLoading,
-  classes,
   totalResults,
-  searchValue
+  query,
+  page,
+  category,
+  fetchSearchResults,
+  classes
 ) {
   if (isLoading) {
     return <CircularProgress size={40} />;
@@ -63,15 +80,40 @@ function renderSearchResults(
       </CardContent>
     </Card>
   ));
-  console.log(searchValue);
+
   return (
     <>
-      <div className={classes.searchResultInfo}>
-        <Typography variant="body1">
-          <b>{totalResults}</b> results for search query <b>{searchValue}</b>
-        </Typography>
-      </div>
+      {query && (
+        <div className={classes.searchResultInfo}>
+          <Typography variant="body1">
+            <b>{totalResults}</b> results for search query <b>"{query}"</b>
+          </Typography>
+        </div>
+      )}
       {visibleResults}
+      {query && (
+        <div className={classes.paginationContainer}>
+          <div>
+            <IconButton
+              disabled={page === 1}
+              onClick={() => fetchSearchResults(query, category, page - 1)}
+            >
+              <KeyboardArrowLeftIcon />
+            </IconButton>
+          </div>
+          <Typography variant="body1" className={classes.paginationCopy}>
+            Page <b>{page}</b> of <b>{Math.ceil(totalResults / PAGE_SIZE)}</b>
+          </Typography>
+          <div>
+            <IconButton
+              disabled={page === Math.ceil(totalResults / PAGE_SIZE)}
+              onClick={() => fetchSearchResults(query, category, page + 1)}
+            >
+              <KeyboardArrowRightIcon />
+            </IconButton>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -80,7 +122,10 @@ export default function SearchResults({
   searchResults,
   isLoading,
   totalResults,
-  searchValue
+  query,
+  page,
+  category,
+  fetchSearchResults
 }) {
   const classes = useStyles();
 
@@ -89,9 +134,12 @@ export default function SearchResults({
       {renderSearchResults(
         searchResults,
         isLoading,
-        classes,
         totalResults,
-        searchValue
+        query,
+        page,
+        category,
+        fetchSearchResults,
+        classes
       )}
     </div>
   );

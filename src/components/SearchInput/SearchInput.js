@@ -114,13 +114,12 @@ export default function SearchInput({
   fetchSearch,
   fetchSearchResults,
   isLoading,
-  results,
-  searchValue,
-  setSearchValue
+  results
 }) {
   const classes = useStyles();
   const [inputFocus, setInputFocus] = useState(false);
   const [listVisible, setListVisible] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const [selectValue, setSelectValue] = useState(categoryDict.ALL);
   const inputRef = useRef(null);
 

@@ -10,10 +10,13 @@ function requestSearchResults() {
   };
 }
 
-function receiveSearchResults(results) {
+function receiveSearchResults(results, query, page, category) {
   return {
     type: REQUEST_SEARCH_RESULTS_SUCCESS,
-    results
+    results,
+    query,
+    page,
+    category
   };
 }
 
@@ -38,7 +41,7 @@ export function fetchSearchResults(q, category, page) {
       .query(query)
       .then(res => {
         // time stamps are a better solution, forward and backward
-        dispatch(receiveSearchResults(JSON.parse(res.text)));
+        dispatch(receiveSearchResults(JSON.parse(res.text), q, page, category));
       });
   };
 }
