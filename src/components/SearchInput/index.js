@@ -31,11 +31,3 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchInput);
-
-// TODO
-// --- Separate out components ---
-// -- wrap callbacks in useCallback (if needed) ---
-// ---- update reducers to not use switch ----
-// --- use the useDebounce hook ---
-// add more info to README.md
-// add prop types
