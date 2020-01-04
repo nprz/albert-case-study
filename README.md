@@ -25,5 +25,5 @@ This project uses the [Material-UI](https://material-ui.com/) component library 
 - Prevent empty string searching: Anytime the input is cleared the API is unnecessarily called. Preventing this would improve performance.
 - Routing: If another page were requested it would be smart to install `react-router-dom` and create a routing structure for the app.
 - Responsive UI: The UI could be improved to be more responsive on mobile devices. While the app is currently usable on a mobile device it is not the greatest experince and could be improved.
-- Pagination: Right now a user view the cannot skip ahead and must view each page one by one. This experience could be improved.
+- Pagination: Right now a user cannot skip ahead and must view each page one by one. This experience could be improved.
 - Tests: There are no tests for this app, if the project were to grow writing tests would be beneficial as it would help ensure that existing code is not broken by features written in the future.
