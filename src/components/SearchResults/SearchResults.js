@@ -1,17 +1,12 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 // Components
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
+import SearchResultCard from "components/SearchResultCard";
+import SearchResultErrorCard from "components/SearchResultErrorCard";
+import Pagination from "components/Pagination";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
-import KeyboardArrowRightIcon from "@material-ui/icons/KeyboardArrowRight";
-import Button from "@material-ui/core/Button";
-
-// Helpers
-import { transparentize } from "polished";
 
 // Style
 import { makeStyles } from "@material-ui/core/Styles";
@@ -24,125 +19,23 @@ const useStyles = makeStyles(theme => {
       flexDirection: "column",
       alignItems: "center"
     },
-    card: {
-      marginBottom: 16,
-      width: "100%",
-      transition: "background-color .2s",
-
-      "&:hover": {
-        backgroundColor: transparentize(0.8, theme.palette.primary.light)
-      }
-    },
     searchResultInfo: {
       width: "100%",
       marginBottom: 16
-    },
-    paginationContainer: {
-      height: 32,
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 32
-    },
-    paginationCopy: {
-      margin: "0px 8px"
-    },
-    errorContent: {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      flexDirection: "column"
     }
   };
 });
 
-const PAGE_SIZE = 10;
-
-function renderSearchResults(
-  searchResults,
-  isLoading,
-  totalResults,
-  query,
-  page,
-  category,
-  fetchSearchResults,
-  error,
-  classes
-) {
-  if (isLoading) {
-    return <CircularProgress size={40} />;
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardContent className={classes.errorContent}>
-          <Typography variant="h6">
-            Sorry! We were unable to process your request for <b>"{query}"</b>
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={() => fetchSearchResults(query, category, page)}
-          >
-            Retry?
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const visibleResults = searchResults.map(result => (
-    <Card
-      className={classes.card}
-      component="a"
-      href={`https://openlibrary.org${result.link}`}
-      rel="noopener"
-      target="_blank"
+function renderSearchResults(searchResults) {
+  return searchResults.map(result => (
+    <SearchResultCard
       key={result.link}
-    >
-      <CardContent>
-        <Typography variant="h6">{result.title}</Typography>
-        <Typography variant="body1">by {result.author}</Typography>
-        <Typography variant="body1">published {result.year}</Typography>
-      </CardContent>
-    </Card>
+      title={result.title}
+      author={result.author}
+      year={result.year}
+      link={result.link}
+    />
   ));
-
-  return (
-    <>
-      {query && (
-        <div className={classes.searchResultInfo}>
-          <Typography variant="body1">
-            <b>{totalResults}</b> results for search query <b>"{query}"</b>
-          </Typography>
-        </div>
-      )}
-      {visibleResults}
-      {query && (
-        <div className={classes.paginationContainer}>
-          <div>
-            <IconButton
-              disabled={page === 1}
-              onClick={() => fetchSearchResults(query, category, page - 1)}
-            >
-              <KeyboardArrowLeftIcon />
-            </IconButton>
-          </div>
-          <Typography variant="body1" className={classes.paginationCopy}>
-            Page <b>{page}</b> of <b>{Math.ceil(totalResults / PAGE_SIZE)}</b>
-          </Typography>
-          <div>
-            <IconButton
-              disabled={page === Math.ceil(totalResults / PAGE_SIZE)}
-              onClick={() => fetchSearchResults(query, category, page + 1)}
-            >
-              <KeyboardArrowRightIcon />
-            </IconButton>
-          </div>
-        </div>
-      )}
-    </>
-  );
 }
 
 export default function SearchResults({
@@ -157,19 +50,57 @@ export default function SearchResults({
 }) {
   const classes = useStyles();
 
+  if (isLoading) {
+    return (
+      <div className={classes.root}>
+        <CircularProgress size={40} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={classes.root}>
+        <SearchResultErrorCard
+          fetchSearchResults={fetchSearchResults}
+          query={query}
+          category={category}
+          page={page}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={classes.root}>
-      {renderSearchResults(
-        searchResults,
-        isLoading,
-        totalResults,
-        query,
-        page,
-        category,
-        fetchSearchResults,
-        error,
-        classes
+      {query && (
+        <div className={classes.searchResultInfo}>
+          <Typography variant="body1">
+            <b>{totalResults}</b> results for search query <b>"{query}"</b>
+          </Typography>
+        </div>
+      )}
+      {renderSearchResults(searchResults)}
+      {query && (
+        <Pagination
+          fetchSearchResults={fetchSearchResults}
+          totalResults={totalResults}
+          query={query}
+          category={category}
+          page={page}
+        />
       )}
     </div>
   );
 }
+
+SearchResults.propTypes = {
+  searchResults: PropTypes.array.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  totalResults: PropTypes.number.isRequired,
+  query: PropTypes.string.isRequired,
+  page: PropTypes.number.isRequired,
+  category: PropTypes.string.isRequired,
+  fetchSearchResults: PropTypes.func.isRequired,
+  error: PropTypes.bool.isRequired
+};

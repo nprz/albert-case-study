@@ -1,20 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import PropTypes from "prop-types";
 
 // Components
+import SearchList from "components/SearchList";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import SearchIcon from "@material-ui/icons/Search";
 import ClearIcon from "@material-ui/icons/Clear";
-import Paper from "@material-ui/core/Paper";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+
+// Helpers
+import useDebounce from "helpers/useDebounce";
 
 // Style
 import { makeStyles } from "@material-ui/core/Styles";
@@ -35,13 +35,6 @@ const useStyles = makeStyles({
   select: {
     width: 75
   },
-  listContainer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 56,
-    marginBottom: 32
-  },
   button: {
     width: 120
   },
@@ -55,53 +48,6 @@ export const categoryDict = {
   ALL: "all",
   TITLE: "title"
 };
-
-function BookListItem({ title, author, link }) {
-  return (
-    <ListItem
-      button
-      component="a"
-      href={`https://openlibrary.org${link}`}
-      target="_blank"
-      rel="noopener"
-    >
-      <ListItemText primary={title} secondary={author} />
-    </ListItem>
-  );
-}
-
-function renderResults(results, searchValue, isLoading, handleClick, error) {
-  if (error) {
-    return (
-      <ListItem key={"key"}>
-        <ListItemText
-          primary={`Sorry! We were unable to process a search for "${searchValue}"`}
-        />
-        <Button onClick={handleClick}>Search Again?</Button>
-      </ListItem>
-    );
-  }
-
-  if (!results.length && searchValue && !isLoading) {
-    return (
-      <ListItem key={"key"}>
-        <ListItemText primary={`Sorry! No results found for ${searchValue}`} />
-        <Button onClick={handleClick}>Search Again?</Button>
-      </ListItem>
-    );
-  }
-
-  return results.map((result, index) => (
-    <div key={result.link}>
-      <BookListItem
-        title={result.title}
-        author={result.author}
-        link={result.link}
-      />
-      {index !== results.length - 1 && <Divider />}
-    </div>
-  ));
-}
 
 function renderMenuItems() {
   let menuItems = [];
@@ -129,7 +75,12 @@ export default function SearchInput({
   const [listVisible, setListVisible] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [selectValue, setSelectValue] = useState(categoryDict.ALL);
+  const debouncedSearchValue = useDebounce(searchValue, 300);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    fetchSearch(debouncedSearchValue, selectValue);
+  }, [debouncedSearchValue, fetchSearch, selectValue]);
 
   useEffect(() => {
     if (searchValue && inputFocus) {
@@ -139,24 +90,26 @@ export default function SearchInput({
     }
   }, [inputFocus, searchValue]);
 
-  const handleChange = e => {
+  const handleChange = useCallback(e => {
     setSearchValue(e.target.value);
-    fetchSearch(e.target.value, selectValue);
     setInputFocus(true);
-  };
+  }, []);
 
-  const handleSearchAgain = () => {
+  const handleSearchAgain = useCallback(() => {
     setSearchValue("");
     fetchSearch("", selectValue);
     inputRef.current.focus();
-  };
+  }, [fetchSearch, selectValue]);
 
-  const handleKeyPress = e => {
-    if (e.key === "Enter") {
-      fetchSearchResults(searchValue, selectValue, 1);
-      setInputFocus(false);
-    }
-  };
+  const handleKeyPress = useCallback(
+    e => {
+      if (e.key === "Enter") {
+        fetchSearchResults(searchValue, selectValue, 1);
+        setInputFocus(false);
+      }
+    },
+    [fetchSearchResults, searchValue, selectValue]
+  );
 
   return (
     <div className={classes.inputContainer}>
@@ -202,19 +155,13 @@ export default function SearchInput({
           }}
         />
         {listVisible && (
-          <div className={classes.listContainer}>
-            <Paper className={classes.paper}>
-              <List disablePadding={true}>
-                {renderResults(
-                  results,
-                  searchValue,
-                  isLoading,
-                  handleSearchAgain,
-                  error
-                )}
-              </List>
-            </Paper>
-          </div>
+          <SearchList
+            results={results}
+            searchValue={debouncedSearchValue}
+            isLoading={isLoading}
+            handleClick={handleSearchAgain}
+            error={error}
+          />
         )}
       </div>
       <Button
@@ -228,3 +175,11 @@ export default function SearchInput({
     </div>
   );
 }
+
+SearchInput.propTypes = {
+  fetchSearch: PropTypes.func.isRequired,
+  fetchSearchResults: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  results: PropTypes.array.isRequired,
+  error: PropTypes.bool.isRequired
+};

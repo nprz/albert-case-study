@@ -3,46 +3,45 @@ import {
   REQUEST_SEARCH_RESULTS_SUCCESS,
   REQUEST_SEARCH_RESULTS_ERROR
 } from "redux/actions/searchResults";
+import createReducer from "helpers/createReducer";
 
-function searchResults(
-  state = {
-    isFetching: false,
-    results: [],
-    totalResults: null,
-    page: null,
-    category: null,
-    query: null,
-    error: false
+const initialState = {
+  isFetching: false,
+  results: [],
+  totalResults: 0,
+  page: 0,
+  category: "all",
+  query: "",
+  error: false
+};
+
+const handlers = {
+  [REQUEST_SEARCH_RESULTS]: (state, action) => {
+    return {
+      ...state,
+      isFetching: true,
+      error: false
+    };
   },
-  action
-) {
-  switch (action.type) {
-    case REQUEST_SEARCH_RESULTS:
-      return {
-        ...state,
-        isFetching: true,
-        error: false
-      };
-    case REQUEST_SEARCH_RESULTS_SUCCESS:
-      return {
-        ...state,
-        results: action.results.docs,
-        totalResults: action.results.numFound,
-        query: action.query,
-        page: action.page,
-        category: action.category,
-        isFetching: false
-      };
-    case REQUEST_SEARCH_RESULTS_ERROR:
-      return {
-        ...state,
-        error: true,
-        query: action.query,
-        isFetching: false
-      };
-    default:
-      return state;
+  [REQUEST_SEARCH_RESULTS_SUCCESS]: (state, action) => {
+    return {
+      ...state,
+      results: action.results.docs,
+      totalResults: action.results.numFound,
+      query: action.query,
+      page: action.page,
+      category: action.category,
+      isFetching: false
+    };
+  },
+  [REQUEST_SEARCH_RESULTS_ERROR]: (state, action) => {
+    return {
+      ...state,
+      error: true,
+      query: action.query,
+      isFetching: false
+    };
   }
-}
+};
 
-export default searchResults;
+export default createReducer(initialState, handlers);
